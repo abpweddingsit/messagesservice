@@ -32,5 +32,15 @@ public class ChatMessageDetails {
 	private Integer isreadmsg;
 	@Column(name = "createdon")
 	private Long createdon;
+	@Column(name = "devplatform")
+	private String devplatform;
+	@Column(name = "calltype")
+	private String calltype;
+	@Column(name = "callduration")
+	private String callduration;
+	@Column(name = "lengthofduration")
+	private String lengthofduration;
+	@Column(name = "roomno")
+	private Long roomno;
 	
 }

@@ -3,9 +3,13 @@ package com.message.communication.dataobjects;
 public class UserSpecificChatHistoryResponse {
 
 	private Long createdon;
-	private String messagebody;
+	private String message;
 	private Integer isreadmsg;
 	private Long messageid;
+	private String senderName;
+	private String targetUserName;
+	private String type;
+	
 	
 	public Long getCreatedon() {
 		return createdon;
@@ -13,11 +17,12 @@ public class UserSpecificChatHistoryResponse {
 	public void setCreatedon(Long createdon) {
 		this.createdon = createdon;
 	}
-	public String getMessagebody() {
-		return messagebody;
+	
+	public String getMessage() {
+		return message;
 	}
-	public void setMessagebody(String messagebody) {
-		this.messagebody = messagebody;
+	public void setMessage(String message) {
+		this.message = message;
 	}
 	public Integer getIsreadmsg() {
 		return isreadmsg;
@@ -31,6 +36,25 @@ public class UserSpecificChatHistoryResponse {
 	public void setMessageid(Long messageid) {
 		this.messageid = messageid;
 	}
+	public String getSenderName() {
+		return senderName;
+	}
+	public void setSenderName(String senderName) {
+		this.senderName = senderName;
+	}
+	public String getTargetUserName() {
+		return targetUserName;
+	}
+	public void setTargetUserName(String targetUserName) {
+		this.targetUserName = targetUserName;
+	}
+	public String getType() {
+		return type;
+	}
+	public void setType(String type) {
+		this.type = type;
+	}
+	
 	
 	
 	

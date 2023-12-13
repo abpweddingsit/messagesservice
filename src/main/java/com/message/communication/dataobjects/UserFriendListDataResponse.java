@@ -11,6 +11,10 @@ public class UserFriendListDataResponse {
 	private String messagebody;
 	private Long lastmessageid;
 	private Integer unreadcount;
+	private Integer isreadmsg;
+	private String calltype;
+	private Integer vdinboundisallowed;
+	
 	
 	
 	public Long getMappedUserid() {
@@ -67,6 +71,25 @@ public class UserFriendListDataResponse {
 	public void setUserphotoimageurl(String userphotoimageurl) {
 		this.userphotoimageurl = userphotoimageurl;
 	}
+	public Integer getIsreadmsg() {
+		return isreadmsg;
+	}
+	public void setIsreadmsg(Integer isreadmsg) {
+		this.isreadmsg = isreadmsg;
+	}
+	public String getCalltype() {
+		return calltype;
+	}
+	public void setCalltype(String calltype) {
+		this.calltype = calltype;
+	}
+	public Integer getVdinboundisallowed() {
+		return vdinboundisallowed;
+	}
+	public void setVdinboundisallowed(Integer vdinboundisallowed) {
+		this.vdinboundisallowed = vdinboundisallowed;
+	}
+	
 	
 	
 

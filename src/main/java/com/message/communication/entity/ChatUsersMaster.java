@@ -36,4 +36,8 @@ public class ChatUsersMaster {
 	private Long createdon;
 	@Column(name = "modifyon")
 	private Long modifyon;
+	@Column(name = "vdoutboundisallowed")
+	private Integer vdoutboundisallowed;
+	@Column(name = "vdinboundisallowed")
+	private Integer vdinboundisallowed;
 }

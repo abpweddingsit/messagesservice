@@ -11,5 +11,9 @@ public class Message {
     private String targetUserName;
     private String message;
     private String type;
-
+    private String createdon;
+    private String modifyon;
+    private String devPlatform;
+    
+    private Long room;
 }

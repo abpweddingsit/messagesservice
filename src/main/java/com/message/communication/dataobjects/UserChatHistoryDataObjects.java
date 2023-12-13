@@ -7,5 +7,6 @@ public interface UserChatHistoryDataObjects {
 	public Integer getIsreadmsg();
 	public String getMessagebody();
 	public Long getMessageid();
-	
+	public Long getUserid();
+	public String getCalltype();
 }
