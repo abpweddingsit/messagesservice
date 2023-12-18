@@ -16,4 +16,5 @@ public class Message {
     private String devPlatform;
     
     private Long room;
+    private String newAppVersionFlag;
 }

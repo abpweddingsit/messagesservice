@@ -1439,7 +1439,50 @@ public class UsersServiceRestcontroller {
 	
 	return new ResponseEntity<Map<String, Object>>(map, HttpStatus.OK);		
 			
-   }		
+   }
+	
+	
+	@CrossOrigin
+	@PostMapping("/chat/vdinboundupdation")
+	public ResponseEntity<Map<String,Object>> vdinboundupdation(@RequestBody Map<String, Object> req){
+		Map<String, Object> map = new HashMap<String,Object>();
+		
+		Long userid = 0l;
+		
+		
+		try {
+			if(req.get("userid")!=null) {
+				userid = Long.parseLong(String.valueOf(req.get("userid")));
+			}
+			
+			
+			log.info(" vdinboundupdation  userid call-->"+userid);
+			
+			
+			List<ChatUsersMaster> chatUser = chatUsersService.getUsersMappedList(userid);
+			
+			
+			if(chatUser!=null && chatUser.size()>0) {
+				ChatUsersMaster user = (ChatUsersMaster) chatUser.get(0);
+				
+				user.setVdinboundisallowed(1);
+				
+				chatUsersService.saveUsersMasters(user);
+			}
+			
+		}catch(Exception e) {
+			   e.printStackTrace();
+				
+			   map.put("status", 0);
+			   map.put("msg", "Failed");
+			return new ResponseEntity<Map<String, Object>>(map, HttpStatus.OK);
+		}
+		
+		map.put("status", 1);
+		map.put("msg", "User Vdinboundisallowed flag is successfully updated to 1");
+		
+		return new ResponseEntity<Map<String, Object>>(map, HttpStatus.OK);	
+	}
 	
 	private StringBuilder getFolder(Long userId){
     	String userFolder = DigestUtils.md5DigestAsHex(userId.toString().getBytes()).toLowerCase();

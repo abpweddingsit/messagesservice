@@ -10,6 +10,7 @@ import java.util.concurrent.ConcurrentMap;
 
 import javax.annotation.PreDestroy;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -21,6 +22,7 @@ import com.corundumstudio.socketio.SocketIOClient;
 import com.corundumstudio.socketio.SocketIOServer;
 import com.corundumstudio.socketio.listener.ConnectListener;
 import com.corundumstudio.socketio.listener.DisconnectListener;
+import com.message.communication.controller.SocketIOController;
 import com.message.communication.controller.UsersServiceRestcontroller;
 import com.message.communication.dataobjects.Action;
 import com.message.communication.dataobjects.AudioVedioResponseMessage;
@@ -72,6 +74,10 @@ public class SocketIOConfig {
 	ConcurrentMap<Long, Map<Long,UUID>> callRoomMap = new ConcurrentHashMap<>();
 	ConcurrentMap<Long, UUID> socArrMap = new ConcurrentHashMap<>();
 	//ConcurrentMap<String,String>  soctempArr = new ConcurrentHashMap<>();
+	
+	ConcurrentMap<Long, Long> callRoomMapDuration = new ConcurrentHashMap<>();
+	
+	ConcurrentMap<String, String> connectedClients = new ConcurrentHashMap<>();
 	
 	
 	@Bean
@@ -172,22 +178,43 @@ public class SocketIOConfig {
 		server.addEventListener("messageSendToUser", Message.class, (client, message, ackSender) -> {
 			log.info("messageSendToUser from client: " + message.toString());
 			
+			
 			List<ChatUsersMaster> userList = chatUsersService.getUsersByUserCode(message.getSenderName());
             List<ChatUsersMaster> mappedUserList = chatUsersService.getUsersByUserCode(message.getTargetUserName());
-            
-            Long from = userList.get(0).getUserid();
-            Long to = mappedUserList.get(0).getUserid();
-            
-            log.info("messageSendToUser from "+from);
-            log.info("messageSendToUser to "+to);
-            
-            
-            UUID entry = (UUID) userIdToSocketIdMap.get(to);
-            log.info("messageSendToUser entry "+entry);
-            
             Map<String, Object> map = new HashMap<String, Object>();
             
-            if(entry!=null) {
+            if(message.getNewAppVersionFlag()==null) {
+            	//For old App to new App text message
+            	
+            	log.info("messageSendToUser from old app to new version: " );
+                SocketIOController s = new SocketIOController(server);
+                List<UserDeviceInfo> deviceinfoDetails = chatUsersService.getUserDeviceInfoDetails(mappedUserList.get(0).getUserid());
+                
+                s.onDataOld(client, message, userList, mappedUserList, deviceinfoDetails, server);
+                
+            }
+            
+            else{
+            	log.info("messageSendToUser from new app to new version: " );
+            	
+            	//List<ChatUsersMaster> userList = chatUsersService.getUsersByUserCode(message.getSenderName());
+                //List<ChatUsersMaster> mappedUserList = chatUsersService.getUsersByUserCode(message.getTargetUserName());
+                
+                Long from = userList.get(0).getUserid();
+                Long to = mappedUserList.get(0).getUserid();
+                
+                log.info("messageSendToUser from "+from);
+                log.info("messageSendToUser to "+to);
+                
+                
+                UUID entry = (UUID) userIdToSocketIdMap.get(to);
+                log.info("messageSendToUser entry "+entry);
+                
+                
+            	
+               if(entry!=null) {
+            	 //For new App to new App text message
+            	   
             	SocketIOClient targetClient = server.getClient(entry);
             	
             	if(targetClient!=null) {
@@ -217,6 +244,12 @@ public class SocketIOConfig {
     		            	String device_id = userDeviceInfo.getPushtoken();  //device id of target
     		            	
     		            	fCMPushGatewayBusinessObject.sendAndroidCampaignPushMessage(device_id,notification,data,from);
+    		            	
+    		            	log.info("messageSendToUser from new app to old version 1: " );
+    		                SocketIOController s = new SocketIOController(server);
+    		                 // List<UserDeviceInfo> deviceinfoDetails = chatUsersService.getUserDeviceInfoDetails(mappedUserList.get(0).getUserid());
+    		                  
+    		                s.onDataOldTest(client, message, userList, mappedUserList, deviceinfoDetails, server);
                 		 }/*else {
                 			//WEB Push Notification
                 			webPushApplicationService.sendNotifications(pushMessage);
@@ -225,17 +258,30 @@ public class SocketIOConfig {
                 	}
                 	
                 }
+              }else {
+            	  //For new App to old App text message
+            	  
+            	  log.info("messageSendToUser from new app to old version: " );
+                  SocketIOController s = new SocketIOController(server);
+                  List<UserDeviceInfo> deviceinfoDetails = chatUsersService.getUserDeviceInfoDetails(mappedUserList.get(0).getUserid());
+                  
+                  s.onDataOld(client, message, userList, mappedUserList, deviceinfoDetails, server);
+                  
               }
-            	map.put("userid", userList.get(0).getUserid());
-                map.put("mappeduserid", mappedUserList.get(0).getUserid());
-                map.put("message", message.getMessage());
-                map.put("type", message.getType());
-                map.put("devPlatform", message.getDevPlatform());
-                
-                usersServiceRestcontroller.usersFriendListUpdation(map);
-                
-                chatUsersService.callJabberSave(userList.get(0).getUserid(), mappedUserList.get(0).getUserid(), message.getMessage());
             
+             //}
+            } 
+            map.put("userid", userList.get(0).getUserid());
+            map.put("mappeduserid", mappedUserList.get(0).getUserid());
+            map.put("message", message.getMessage());
+            map.put("type", message.getType());
+            map.put("devPlatform", message.getDevPlatform());
+            
+            usersServiceRestcontroller.usersFriendListUpdation(map);
+            
+            
+            
+            chatUsersService.callJabberSave(userList.get(0).getUserid(), mappedUserList.get(0).getUserid(), message.getMessage());
 		});
 		
 		
@@ -496,6 +542,14 @@ public class SocketIOConfig {
 			else {
             UUID entryTo = (UUID) userIdToSocketIdMap.get(data.getTo());
             
+            List<UserDeviceInfo> deviceinfoDetails1 = new ArrayList();
+            
+            if(data.getInitiateCallUser().equals(data.getFrom()) || data.getInitiateCallUser()==data.getFrom())
+				 deviceinfoDetails1 = chatUsersService.getUserDeviceInfoDetails(data.getTo());
+			else
+				deviceinfoDetails1 = chatUsersService.getUserDeviceInfoDetails(data.getFrom());
+            
+            
             if(entryTo!=null ) {
             	log.info("misesdcall entryTo: " + entryTo);
             	//for (UUID  entry : userIdArrTo) {
@@ -509,13 +563,13 @@ public class SocketIOConfig {
             			
             			
             			
-            			List<UserDeviceInfo> deviceinfoDetails = chatUsersService.getUserDeviceInfoDetails(data.getTo());
-	    				log.info("Check deviceinfoDetails size for Missed call-->"+deviceinfoDetails.size());
-	    				String pushMessage = data.getTo() +" is missed the call";
+            			
+	    				log.info("Check deviceinfoDetails size for Missed call-->"+deviceinfoDetails1.size());
+	    				//String pushMessage = data.getTo() +" is missed the call";
 	    				
-	    				if(deviceinfoDetails!=null && deviceinfoDetails.size()>0) {
+	    				/*if(deviceinfoDetails1!=null && deviceinfoDetails1.size()>0) {
 	                		
-	                		UserDeviceInfo userDeviceInfo = (UserDeviceInfo)deviceinfoDetails.get(0);
+	                		UserDeviceInfo userDeviceInfo = (UserDeviceInfo)deviceinfoDetails1.get(0);
 	                		  if(userDeviceInfo.getPlatform().equals("android") || userDeviceInfo.getPlatform().equals("ios") || userDeviceInfo.getPlatform().equals("iPhone")) {
 	                			//PUSH Notification
 	    		            	FCMPushGatewayBusinessObject fCMPushGatewayBusinessObject = new FCMPushGatewayBusinessObject();
@@ -533,14 +587,17 @@ public class SocketIOConfig {
 	    		            	
 	    		            	fCMPushGatewayBusinessObject.sendAndroidMissedCallPushMessage(device_id,notification,data1,data.getTo());
 	                		 }
-	                	}
+	                	}*/
+	    				
+            		   }
+	    				String pushMessage1 = "You have a missed call";
 	    				
 	    				
-	    				String pushMessage1 = "Someone has sent you a missed call";
+	    				//List<UserDeviceInfo> deviceinfoDetails = chatUsersService.getUserDeviceInfoDetails(data.getTo());
 	                    
-	                    if(deviceinfoDetails!=null && deviceinfoDetails.size()>0) {
+	                    if(deviceinfoDetails1!=null && deviceinfoDetails1.size()>0) {
 	                      //for(UserDeviceInfo userDeviceInfo : deviceinfoDetails) {
-	                      UserDeviceInfo userDeviceInfo = (UserDeviceInfo)deviceinfoDetails.get(0);
+	                      UserDeviceInfo userDeviceInfo = (UserDeviceInfo)deviceinfoDetails1.get(0);
 	                        if(userDeviceInfo.getPlatform().equals("android") || userDeviceInfo.getPlatform().equals("ios") || userDeviceInfo.getPlatform().equals("iPhone")) {
 	                        //PUSH Notification
 	                        FCMPushGatewayBusinessObject fCMPushGatewayBusinessObject = new FCMPushGatewayBusinessObject();
@@ -561,9 +618,11 @@ public class SocketIOConfig {
 	                    }
             			//userIdArrTo.remove(entry);
             			//userIdToSocketIdMap.remove(data.getTo(), userIdArrTo);
+            		}else {
+            			log.info("else misesdcall entryTo: 22222" );
             		}
             	//}
-            }
+            //}
             
 		  }
 			
@@ -736,9 +795,16 @@ public class SocketIOConfig {
 		    				acceptResponse.setFrom(data.getFrom());
 		    				acceptResponse.setAns(data.getAns());
 		    				
+		    				Long startTime = System.currentTimeMillis();
+		    				log.info("acceptCall startTime "+startTime);
+		    				
+		    				callRoomMapDuration.put(data.getRoom(), startTime);
+		    				
 		    				log.info("acceptCall acceptResponse "+acceptResponse.toString());
 		    				
 		    				targetClient.sendEvent("callAccepted",acceptResponse);
+		    				
+		    				
 		    				
 		    				List<ChatAudioVedioDetails> list = chatUsersService.getAudioVedioDetailsByUserId( data.getTo(), data.getFrom());
 		 	    		    if(list!=null && list.size()>0) {
@@ -1146,7 +1212,8 @@ public class SocketIOConfig {
 			
 			Map<Long,UUID>  soctempArr = (Map<Long,UUID>) callRoomMap.get(data.getRoom());
 			//log.info("endCall soctempArr size: " + soctempArr.size());
-			
+			Long startTime = (Long)callRoomMapDuration.get(data.getRoom());
+			log.info("endCall startTime: " + startTime);
 			
 			
 			if(soctempArr!=null && soctempArr.size()>0) {
@@ -1254,7 +1321,130 @@ public class SocketIOConfig {
 						
 						
 					}*/
-					
+				     
+				     
+				     //Save Duration
+				     Long endTime = System.currentTimeMillis();
+				     log.info("endCall endTime: " + endTime);
+				    if(startTime == null) {}
+				    else {
+				     if(endTime > startTime) {
+				    	 Map<String, Object> map = new HashMap<String, Object>();
+				    	 long diff = endTime - startTime;
+				    	 
+				    	 long diffSeconds = diff / 1000 % 60;
+						 long diffMinutes = diff / (60 * 1000) % 60;
+							
+							String diffSec = "";
+							String diffMin = "";
+							
+							if(diffSeconds<10){
+								diffSec = "0"+diffSeconds;
+							}else{
+								diffSec = Long.toString(diffSeconds);
+							}
+							
+							if(diffMinutes<10){
+								diffMin = "0"+diffMinutes;
+							}else{
+								diffMin = Long.toString(diffMinutes);
+							}
+						 
+						  String duration = diffMin + ":" + diffSec;
+						  
+						  log.info("endCall duration "+duration);
+						  
+						  
+						  map.put("userid", data.getInitiateCallUser());
+					      
+					      if(data.getInitiateCallUser().equals(data.getFrom()) || data.getInitiateCallUser()==data.getFrom())
+					    	  map.put("mappeduserid", data.getTo());
+					      else
+					    	  map.put("mappeduserid", data.getFrom()); 
+		                  map.put("message", duration);
+		                  map.put("type", data.getCalltype());
+		                  map.put("devPlatform", data.getDevplatform());
+		                
+		                usersServiceRestcontroller.usersFriendListUpdation(map);
+		                
+		                
+		              
+		                if(data.getCalltype().equals("video")) {
+		                	List<ChatUsersMaster> mstList = chatUsersService.getUsersMappedList(data.getFrom());
+		                	if(mstList!=null && mstList.size()>0) {
+			                	Integer vcconsumedminutes = mstList.get(0).getVcconsumedminutes();
+			                	Integer vcallowedminiutes = mstList.get(0).getVcallowedminiutes();
+			                	
+			                	
+			                	
+			                	
+			                	
+			                	String[] mindurationArr = duration.split(":");
+			                	String min = mindurationArr[0];
+			                	
+			                	log.info("endCall min in video-->"+min);
+			                	
+			                	Integer minduration = Integer.parseInt(min);
+			                	Integer summinduration = vcconsumedminutes + minduration;
+			                	
+			                	log.info("endCall vcconsumedminutes in video-->"+vcconsumedminutes);
+			                	log.info("endCall vcallowedminiutes in video-->"+vcallowedminiutes);
+			                	log.info("endCall minduration in video-->"+minduration);
+			                	log.info("endCall summinduration in video-->"+summinduration);
+			                	
+			                	ChatUsersMaster user = (ChatUsersMaster)mstList.get(0);
+			                	
+			                	if(summinduration > vcallowedminiutes) {
+			                		user.setVdoutboundisallowed(2);
+			                		user.setVcconsumedminutes(minduration);
+			                		
+			                		chatUsersService.saveUsersMasters(user);
+			                	}else {
+			                		if(minduration>0) {
+			                		 user.setVcconsumedminutes(minduration);
+			                		
+			                		 chatUsersService.saveUsersMasters(user);
+			                		}
+			                	}
+		                	}
+		                }else if(data.getCalltype().equals("voice")){
+		                	List<ChatUsersMaster> mstList = chatUsersService.getUsersMappedList(data.getFrom());
+		                	if(mstList!=null && mstList.size()>0) {
+			                	Integer aucconsumedminutes = mstList.get(0).getAucconsumedminutes();
+			                	Integer aucallowedminiutes = mstList.get(0).getAucallowedminiutes();
+			                	
+			                	
+			                	String[] mindurationArr = duration.split(":");
+			                	String min = mindurationArr[0];
+			                	
+			                	log.info("endCall min in voice-->"+min);
+			                	
+			                	Integer minduration = Integer.parseInt(min);
+			                	Integer summinduration = aucconsumedminutes + minduration;
+			                	
+			                	log.info("endCall aucconsumedminutes in voice-->"+aucconsumedminutes);
+			                	log.info("endCall aucallowedminiutes in voice-->"+aucallowedminiutes);
+			                	log.info("endCall minduration in voice-->"+minduration);
+			                	log.info("endCall summinduration in voice-->"+summinduration);
+			                	
+			                	ChatUsersMaster user = (ChatUsersMaster)mstList.get(0);
+			                	
+			                	if(summinduration > aucallowedminiutes) {
+			                		user.setVdoutboundisallowed(2);
+			                		user.setAucconsumedminutes(minduration);
+			                		
+			                		chatUsersService.saveUsersMasters(user);
+			                	}else {
+			                		user.setAucconsumedminutes(minduration);
+			                		
+			                		chatUsersService.saveUsersMasters(user);
+			                	}
+		                	}
+		                }
+		                
+		               }
+				    }
+				    
 					  List<ChatAudioVedioDetails> list = chatUsersService.getAudioVedioDetailsByUserId(data.getFrom(), data.getTo());
 		    		   if(list!=null && list.size()>0) {
 		    			   ChatAudioVedioDetails chatAudioVedioDetails = (ChatAudioVedioDetails) list.get(0);
@@ -1381,6 +1571,14 @@ public class SocketIOConfig {
 				log.info("clearRoomandSockets soctempArr size: " + callRoomMap.size());
 				callRoomMap.remove(data.getRoom());
 			}
+			
+			if(callRoomMapDuration!=null && callRoomMapDuration.size()>0) {
+				log.info("callRoomMapDuration size: " + callRoomMapDuration.size());
+				callRoomMapDuration.remove(data.getRoom());
+			}
+			
+			
+			
 		});
 		
 		return server;

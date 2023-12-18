@@ -1,13 +1,9 @@
 package com.message.communication.controller;
 
 import java.net.URISyntaxException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -15,25 +11,23 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
 import com.corundumstudio.socketio.AckRequest;
 import com.corundumstudio.socketio.SocketIOClient;
 import com.corundumstudio.socketio.SocketIOServer;
-import com.corundumstudio.socketio.annotation.OnEvent;
 import com.corundumstudio.socketio.listener.ConnectListener;
 import com.corundumstudio.socketio.listener.DataListener;
 import com.corundumstudio.socketio.listener.DisconnectListener;
 import com.message.communication.dataobjects.Data;
 import com.message.communication.dataobjects.Message;
 import com.message.communication.dataobjects.Notification;
-import com.message.communication.dataobjects.VedioMessage;
 import com.message.communication.entity.ChatUsersMaster;
 import com.message.communication.entity.UserDeviceInfo;
 import com.message.communication.external.FCMPushGatewayBusinessObject;
 import com.message.communication.service.ChatUsersService;
 import com.message.communication.service.WebPushApplicationService;
+import com.message.communication.service.impl.ChatUsersServiceImpl;
 
 import io.socket.client.IO;
 import io.socket.client.Socket;
@@ -63,7 +57,7 @@ public class SocketIOController {
 	ConcurrentMap<String, String> socArrMap = new ConcurrentHashMap<>();
 	
 	
-	SocketIOController(SocketIOServer socketServer){
+	public SocketIOController(SocketIOServer socketServer){
         this.socketServer=socketServer;
 
         this.socketServer.addConnectListener(onUserConnectWithSocket);
@@ -233,6 +227,210 @@ public class SocketIOController {
     };
     
     
+    public void onDataOld(SocketIOClient client, Message message, List<ChatUsersMaster> userList, List<ChatUsersMaster> mappedUserList, List<UserDeviceInfo> deviceinfoDetails, SocketIOServer server) throws Exception {
+
+        /**
+            * Sending message to target user
+            * target user should subscribe the socket event with his/her name.
+            * Send the same payload to user
+            */
+       	//message.setCreatedon(Long.toString(System.currentTimeMillis()));
+       	logger.info(message.getSenderName()+" onDataOld user send message to user "+message.getTargetUserName()+" and message is "+message.getMessage()+" and createdon is "+message.getCreatedon()+" and type is "+message.getType()+" and modifyon is "+message.getModifyon()+ " and devPlatform "+message.getDevPlatform()+ " and type "+message.getType());
+       	//ChatUsersService chatUsersService = new ChatUsersServiceImpl();
+       	// List<ChatUsersMaster> userList = chatUsersService.getUsersByUserCode(message.getSenderName());
+         //   List<ChatUsersMaster> mappedUserList = chatUsersService.getUsersByUserCode(message.getTargetUserName());
+       	
+       	Map<String, String> connectedClientsmap = new HashMap<>();
+            
+       	server.addConnectListener(new ConnectListener() {
+           	@Override
+               public void onConnect(SocketIOClient client) {
+                 //logger.info("client connected! "+message.getTargetUserName());
+                 String targetusername=message.getTargetUserName();
+                 //client.set("targetusername",targetusername);
+                 if(StringUtils.isNotEmpty(targetusername)) {
+                	 connectedClientsmap.put(targetusername, targetusername);
+                 }
+                 //userIdToSocketIdMap.put(mappedUserList.get(0).getUserid(), mappedUserList.get(0).getUserid());
+               }
+           });
+       	
+       	try {
+       		server.getBroadcastOperations().sendEvent(message.getTargetUserName(),client, message);
+       	logger.info("socketServer.getBroadcastOperations().sendEvent()....");
+       	}catch (Exception e) {
+               // Handle exceptions
+               e.printStackTrace();
+           }
+           //System.out.println(message.getSenderName()+" user send message to user "+message.getTargetUserName()+" and message is "+message.getMessage());
+       	
+           /*Map<String, Object> map = new HashMap<String, Object>();
+           
+          
+           
+           map.put("userid", userList.get(0).getUserid());
+           map.put("mappeduserid", mappedUserList.get(0).getUserid());
+           map.put("message", message.getMessage());
+           map.put("type", message.getType());
+           map.put("devPlatform", message.getDevPlatform());
+           
+           usersServiceRestcontroller.usersFriendListUpdation(map);
+           
+           chatUsersService.callJabberSave(userList.get(0).getUserid(), mappedUserList.get(0).getUserid(), message.getMessage());*/
+			
+			//Prod
+			//String toJID = mappedScreenVal+"@ip-10-200-18-60.ap-southeast-1.compute.internal";
+           
+           //socketServer.getBroadcastOperations().sendEvent(message.getTargetUserName(),client, message);
+           
+           /**
+            * After sending message to target user we can send acknowledge to sender
+            */
+           //acknowledge.sendAckData("Message send to target user successfully");
+           
+           
+           
+           logger.info("Check a user is online or not-->"+message.getTargetUserName()+" "+connectedClientsmap.containsKey(message.getTargetUserName()));
+           
+           if(connectedClientsmap.containsKey(message.getTargetUserName())==false) {
+           //	List<UserDeviceInfo> deviceinfoDetails = chatUsersService.getUserDeviceInfoDetails(mappedUserList.get(0).getUserid());
+           	
+           	logger.info("Check deviceinfoDetails size-->"+deviceinfoDetails.size());
+           	
+           	String pushMessage = "Someone has sent you a message";
+           	
+           	if(deviceinfoDetails!=null && deviceinfoDetails.size()>0) {
+           		//for(UserDeviceInfo userDeviceInfo : deviceinfoDetails) {
+           		UserDeviceInfo userDeviceInfo = (UserDeviceInfo)deviceinfoDetails.get(0);
+           		  if(userDeviceInfo.getPlatform().equals("android") || userDeviceInfo.getPlatform().equals("ios") || userDeviceInfo.getPlatform().equals("iPhone")) {
+           			//PUSH Notification
+		            	FCMPushGatewayBusinessObject fCMPushGatewayBusinessObject = new FCMPushGatewayBusinessObject();
+		            	Notification notification = new Notification();
+		            	
+		            	Data data = new Data();
+		            	data.setSource("AET");
+		            	data.setBody(pushMessage);
+		            	
+		            	String device_id = userDeviceInfo.getPushtoken();  //device id of target
+		            	
+		            	fCMPushGatewayBusinessObject.sendAndroidCampaignPushMessage(device_id,notification,data,userList.get(0).getUserid());
+           		 }
+           	}
+           	
+           	
+           	
+           }
+      
+       	
+       	
+           server.addDisconnectListener(new DisconnectListener() {
+				
+				@Override
+				public void onDisconnect(SocketIOClient client) {
+					// TODO Auto-generated method stub
+					//logger.info("client disconnected !"+message.getTargetUserName());
+					if(StringUtils.isNotEmpty(message.getTargetUserName())) {
+					 String remove_value = (String)connectedClientsmap.remove(message.getTargetUserName());
+					 //userIdToSocketIdMap.remove(mappedUserList.get(0).getUserid());
+	            	 //logger.info("HashMap is remove value is-->"+remove_value);	
+					}
+				}
+			});
+           /*else {
+           	 Map<String, Object> mapdelivered = new HashMap<String, Object>();
+           	
+           	 mapdelivered.put("userid", userList.get(0).getUserid());
+           	 mapdelivered.put("mappeduserid", mappedUserList.get(0).getUserid());
+                
+                usersServiceRestcontroller.usersFriendListMessageDeliveredUpdation(mapdelivered);
+           }*/
+           //connectedClients.remove("targetusername",message.getTargetUserName());
+           
+           
+          // socketServer.addConnectListener(connectedClients.put(message.getTargetUserName(), client));
+           /*try {
+               client(message);
+           } catch (URISyntaxException e) {
+               e.printStackTrace();
+           }*/
+           
+           
+       }
+    
+    
+    
+    public void onDataOldTest(SocketIOClient client, Message message, List<ChatUsersMaster> userList, List<ChatUsersMaster> mappedUserList, List<UserDeviceInfo> deviceinfoDetails, SocketIOServer server) throws Exception {
+
+        /**
+            * Sending message to target user
+            * target user should subscribe the socket event with his/her name.
+            * Send the same payload to user
+            */
+       	//message.setCreatedon(Long.toString(System.currentTimeMillis()));
+       	logger.info(message.getSenderName()+" onDataOldTest user send message to user "+message.getTargetUserName()+" and message is "+message.getMessage()+" and createdon is "+message.getCreatedon()+" and type is "+message.getType()+" and modifyon is "+message.getModifyon()+ " and devPlatform "+message.getDevPlatform()+ " and type "+message.getType());
+       	//ChatUsersService chatUsersService = new ChatUsersServiceImpl();
+       	// List<ChatUsersMaster> userList = chatUsersService.getUsersByUserCode(message.getSenderName());
+         //   List<ChatUsersMaster> mappedUserList = chatUsersService.getUsersByUserCode(message.getTargetUserName());
+       	
+       	Map<String, String> connectedClientsmap = new HashMap<>();
+            
+       	server.addConnectListener(new ConnectListener() {
+           	@Override
+               public void onConnect(SocketIOClient client) {
+                 //logger.info("client connected! "+message.getTargetUserName());
+                 String targetusername=message.getTargetUserName();
+                 //client.set("targetusername",targetusername);
+                 if(StringUtils.isNotEmpty(targetusername)) {
+                	 connectedClientsmap.put(targetusername, targetusername);
+                 }
+                 //userIdToSocketIdMap.put(mappedUserList.get(0).getUserid(), mappedUserList.get(0).getUserid());
+               }
+           });
+       	
+       	try {
+       		server.getBroadcastOperations().sendEvent(message.getTargetUserName(),client, message);
+       	logger.info("socketServer.getBroadcastOperations().sendEvent()....");
+       	}catch (Exception e) {
+               // Handle exceptions
+               e.printStackTrace();
+           }
+           
+      
+       	server.addDisconnectListener(new DisconnectListener() {
+				
+				@Override
+				public void onDisconnect(SocketIOClient client) {
+					// TODO Auto-generated method stub
+					//logger.info("client disconnected !"+message.getTargetUserName());
+					if(StringUtils.isNotEmpty(message.getTargetUserName())) {
+					 String remove_value = (String)connectedClientsmap.remove(message.getTargetUserName());
+					 //userIdToSocketIdMap.remove(mappedUserList.get(0).getUserid());
+	            	 //logger.info("HashMap is remove value is-->"+remove_value);	
+					}
+				}
+			});
+           /*else {
+           	 Map<String, Object> mapdelivered = new HashMap<String, Object>();
+           	
+           	 mapdelivered.put("userid", userList.get(0).getUserid());
+           	 mapdelivered.put("mappeduserid", mappedUserList.get(0).getUserid());
+                
+                usersServiceRestcontroller.usersFriendListMessageDeliveredUpdation(mapdelivered);
+           }*/
+           //connectedClients.remove("targetusername",message.getTargetUserName());
+           
+           
+          // socketServer.addConnectListener(connectedClients.put(message.getTargetUserName(), client));
+           /*try {
+               client(message);
+           } catch (URISyntaxException e) {
+               e.printStackTrace();
+           }*/
+           
+           
+       }
+    
+    
     public boolean isUserOnline(String userId) {
     	if(StringUtils.isNotEmpty(userId)) {
             return connectedClients.containsKey(userId);
@@ -240,6 +438,8 @@ public class SocketIOController {
     		return false;
     	}
     }
+    
+    
     
     
     

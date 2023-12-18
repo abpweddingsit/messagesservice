@@ -40,4 +40,12 @@ public class ChatUsersMaster {
 	private Integer vdoutboundisallowed;
 	@Column(name = "vdinboundisallowed")
 	private Integer vdinboundisallowed;
+	@Column(name = "vcallowedminiutes")
+	private Integer vcallowedminiutes;
+	@Column(name = "vcconsumedminutes")
+	private Integer vcconsumedminutes;
+	@Column(name = "aucallowedminiutes")
+	private Integer aucallowedminiutes;
+	@Column(name = "aucconsumedminutes")
+	private Integer aucconsumedminutes;
 }
