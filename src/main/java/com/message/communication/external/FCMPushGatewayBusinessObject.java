@@ -481,7 +481,7 @@ public class FCMPushGatewayBusinessObject {
 		// used in production
 		public void sendAndroidCampaignVedioOnlinePushMessage(String device_id, final Notification ntObject, final PushData fcmdata,Long mappeduserId) { 
 				        
-						logger.info(new StringBuffer("device_id is in sendAndroidCampaignVedioOnlinePushMessage..").append(device_id).append(" for mappeduserId in sendAndroidCampaignVedioPushMessage..").append(mappeduserId).toString());
+						//logger.info(new StringBuffer("device_id is in sendAndroidCampaignVedioOnlinePushMessage..").append(device_id).append(" for mappeduserId in sendAndroidCampaignVedioPushMessage..").append(mappeduserId).toString());
 						
 						try {
 							JSONArray device_ids = new JSONArray();
@@ -576,7 +576,7 @@ public class FCMPushGatewayBusinessObject {
 							}
 							data.put("actions", action_ids);
 							
-							logger.info("Sending push notifications actions is sendAndroidCampaignVedioOnlinePushMessage "+action_ids.toString());
+							//logger.info("Sending push notifications actions is sendAndroidCampaignVedioOnlinePushMessage "+action_ids.toString());
 							
 							
 							//body.put("notification", notification);
@@ -696,7 +696,7 @@ public class FCMPushGatewayBusinessObject {
 						}
 						data.put("actions", action_ids);
 						
-						logger.info("Sending push notifications actions is "+action_ids.toString());
+						//logger.info("Sending push notifications actions is "+action_ids.toString());
 						
 						
 						body.put("notification", notification);

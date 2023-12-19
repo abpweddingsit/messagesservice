@@ -169,7 +169,7 @@
 	</build>
 	
 	<profiles>
-        <profile>
+        <!--<profile>
             <id>dev</id>
             <properties>
                 <activatedProperties>dev</activatedProperties>
@@ -177,13 +177,13 @@
             <activation>
                 <activeByDefault>true</activeByDefault>
             </activation>
-        </profile>
-       <!-- <profile>
+        </profile>-->
+        <profile>
             <id>prod</id>
             <properties>
                 <activatedProperties>prod</activatedProperties>
             </properties>
-        </profile>-->
+        </profile>
     </profiles>
 
 </project>

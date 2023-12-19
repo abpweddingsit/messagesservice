@@ -8,6 +8,7 @@ import javax.persistence.Id;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
+import lombok.Builder.Default;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
@@ -37,15 +38,15 @@ public class ChatUsersMaster {
 	@Column(name = "modifyon")
 	private Long modifyon;
 	@Column(name = "vdoutboundisallowed")
-	private Integer vdoutboundisallowed;
+	private Integer vdoutboundisallowed=0;
 	@Column(name = "vdinboundisallowed")
-	private Integer vdinboundisallowed;
+	private Integer vdinboundisallowed=0;
 	@Column(name = "vcallowedminiutes")
-	private Integer vcallowedminiutes;
+	private Integer vcallowedminiutes=30;
 	@Column(name = "vcconsumedminutes")
-	private Integer vcconsumedminutes;
+	private Integer vcconsumedminutes=0;
 	@Column(name = "aucallowedminiutes")
-	private Integer aucallowedminiutes;
+	private Integer aucallowedminiutes=30;
 	@Column(name = "aucconsumedminutes")
-	private Integer aucconsumedminutes;
+	private Integer aucconsumedminutes=0;
 }

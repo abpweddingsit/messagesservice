@@ -122,8 +122,8 @@ public class SocketIOConfig {
 			
 			//Map<Long,UUID> userIdArr = new HashMap();
 			//List<UUID> userIdArr = new ArrayList();
-			
-			
+			if(data.getFrom()==null) {}
+			else {
 			if(userIdToSocketIdMap.containsKey(data.getFrom())) {
 				//Map<Long,UUID> userIdArr1 = (Map<Long,UUID>) userIdToSocketIdMap.get(data.getFrom());
 				
@@ -137,7 +137,7 @@ public class SocketIOConfig {
 						UUID clientId = client.getSessionId();
 						//userIdArr1.add(clientId);
 						//log.info("registerUser userIdArr size is in IF: " + userIdArr1.size());
-						log.info("registerUser in clientId at IF : " + clientId + " userId "+data.getFrom());
+						//log.info("registerUser in clientId at IF : " + clientId + " userId "+data.getFrom());
 						userIdToSocketIdMap.put(data.getFrom(), clientId);
 						
 						SocketIOClient targetClient = server.getClient(clientId);
@@ -155,7 +155,7 @@ public class SocketIOConfig {
 				//userIdArr.add(clientId);
 				//userIdArr.add(clientId);
 				//log.info("registerUser userIdArr size is in else: " + userIdArr.size());
-				log.info("registerUser in clientId at else : " + clientId + " userId "+data.getFrom());
+				//log.info("registerUser in clientId at else : " + clientId + " userId "+data.getFrom());
 				userIdToSocketIdMap.put(data.getFrom(), clientId);
 				
 				SocketIOClient targetClient = server.getClient(clientId);
@@ -169,7 +169,7 @@ public class SocketIOConfig {
 			//ackSender.sendAckData("registerUser");
 			//server.getBroadcastOperations().sendEvent("registerUser",client, data);
 			
-			
+			}	
 			
 			
 		});
@@ -203,8 +203,8 @@ public class SocketIOConfig {
                 Long from = userList.get(0).getUserid();
                 Long to = mappedUserList.get(0).getUserid();
                 
-                log.info("messageSendToUser from "+from);
-                log.info("messageSendToUser to "+to);
+                //log.info("messageSendToUser from "+from);
+                //log.info("messageSendToUser to "+to);
                 
                 
                 UUID entry = (UUID) userIdToSocketIdMap.get(to);
@@ -225,7 +225,7 @@ public class SocketIOConfig {
             	}else {
                 	List<UserDeviceInfo> deviceinfoDetails = chatUsersService.getUserDeviceInfoDetails(to);
                 	
-                	log.info("Check deviceinfoDetails size in messageSendToUser-->"+deviceinfoDetails.size());
+                	//log.info("Check deviceinfoDetails size in messageSendToUser-->"+deviceinfoDetails.size());
                 	
                 	String pushMessage = "Someone has sent you a message";
                 	
@@ -245,7 +245,7 @@ public class SocketIOConfig {
     		            	
     		            	fCMPushGatewayBusinessObject.sendAndroidCampaignPushMessage(device_id,notification,data,from);
     		            	
-    		            	log.info("messageSendToUser from new app to old version 1: " );
+    		            	//log.info("messageSendToUser from new app to old version 1: " );
     		                SocketIOController s = new SocketIOController(server);
     		                 // List<UserDeviceInfo> deviceinfoDetails = chatUsersService.getUserDeviceInfoDetails(mappedUserList.get(0).getUserid());
     		                  
@@ -406,9 +406,9 @@ public class SocketIOConfig {
 					    		
 					    		
 					    		if(entry!=null) {
-					    			log.info("initCall entry is : " + entry+" toUser "+data.getTo());
+					    			//log.info("initCall entry is : " + entry+" toUser "+data.getTo());
 					    			UUID entryFrom = (UUID) userIdToSocketIdMap.get(data.getFrom());
-					    			log.info("initCall entry is : " + entryFrom+" fromUser "+data.getFrom());
+					    			//log.info("initCall entry is : " + entryFrom+" fromUser "+data.getFrom());
 					    			
 					    			
 					    			//ackSender.sendAckData("IncommingCallNotification");
@@ -421,7 +421,7 @@ public class SocketIOConfig {
 					    			//log.info("initCall within entry not null in clientId: " + entry + " client connected "+client.isChannelOpen());
 					    			if(targetClient!=null) {
 					    			   VedioMessageInitResponse initResponse = new VedioMessageInitResponse();
-					    			   log.info("initCall within entry not null in clientId connected: " + targetClient.isChannelOpen());
+					    			   //log.info("initCall within entry not null in clientId connected: " + targetClient.isChannelOpen());
 					    			   
 					    			   initResponse.setFrom(data.getFrom());
 					    			   initResponse.setRoom(data.getRoom());
@@ -473,11 +473,11 @@ public class SocketIOConfig {
 			UUID entry = (UUID) userIdToSocketIdMap.get(data.getFrom());
 			
 			if(entry!=null ) {
-				log.info("calltime entry: " + entry);
+				//log.info("calltime entry: " + entry);
 				
 				SocketIOClient targetClient = server.getClient(entry);
 				if(targetClient!=null) {
-					log.info("calltime is targetClient open from UUID : " + targetClient.isChannelOpen()+" user from :" +data.getFrom());
+					//log.info("calltime is targetClient open from UUID : " + targetClient.isChannelOpen()+" user from :" +data.getFrom());
 					
 					CalltimeResponse calltimeResponse = new CalltimeResponse();
 					
@@ -494,11 +494,11 @@ public class SocketIOConfig {
            UUID entryto = (UUID) userIdToSocketIdMap.get(data.getTo());
 			
 			if(entryto!=null ) {
-				log.info("calltime entryto: " + entryto);
+				//log.info("calltime entryto: " + entryto);
 				
 				SocketIOClient targetClient = server.getClient(entryto);
 				if(targetClient!=null) {
-					log.info("calltime is targetClient open to UUID : " + targetClient.isChannelOpen()+" user to :" +data.getTo());
+					//log.info("calltime is targetClient open to UUID : " + targetClient.isChannelOpen()+" user to :" +data.getTo());
 					
 					CalltimeResponse calltimeResponse = new CalltimeResponse();
 					
@@ -522,11 +522,11 @@ public class SocketIOConfig {
 	            UUID entry = (UUID) userIdToSocketIdMap.get(data.getFrom());
 	            
 	            if(entry!=null ) {
-	            	log.info("misesdcall entry: " + entry);
+	            	//log.info("misesdcall entry: " + entry);
 	            	//for (UUID  entry : userIdArr) {
 	            		SocketIOClient targetClient = server.getClient(entry);
 	            		if(targetClient!=null) {
-	            			log.info("misesdcall is targetClient open from UUID : " + targetClient.isChannelOpen()+" user :" +data.getFrom());
+	            			//log.info("misesdcall is targetClient open from UUID : " + targetClient.isChannelOpen()+" user :" +data.getFrom());
 	            			MissedCallResponse missResponse = new MissedCallResponse();
 	            			missResponse.setCall(data.getCall());
 	            			
@@ -551,11 +551,11 @@ public class SocketIOConfig {
             
             
             if(entryTo!=null ) {
-            	log.info("misesdcall entryTo: " + entryTo);
+            	//log.info("misesdcall entryTo: " + entryTo);
             	//for (UUID  entry : userIdArrTo) {
             		SocketIOClient targetClient = server.getClient(entryTo);
             		if(targetClient!=null) {
-            			log.info("misesdcall is targetClient open to UUID : " + targetClient.isChannelOpen()+ " user :"+data.getTo());
+            			//log.info("misesdcall is targetClient open to UUID : " + targetClient.isChannelOpen()+ " user :"+data.getTo());
             			MissedCallResponse missResponse = new MissedCallResponse();
             			missResponse.setCall(data.getCall());
             			
@@ -564,7 +564,7 @@ public class SocketIOConfig {
             			
             			
             			
-	    				log.info("Check deviceinfoDetails size for Missed call-->"+deviceinfoDetails1.size());
+	    				//log.info("Check deviceinfoDetails size for Missed call-->"+deviceinfoDetails1.size());
 	    				//String pushMessage = data.getTo() +" is missed the call";
 	    				
 	    				/*if(deviceinfoDetails1!=null && deviceinfoDetails1.size()>0) {
@@ -676,7 +676,7 @@ public class SocketIOConfig {
 			soctempArr.put(data.getTo(), (UUID) userIdToSocketIdMap.get(data.getTo()));
 	    	callRoomMap.put(data.getRoom(),soctempArr);
 	    	
-	    	log.info("getCallDetails soctempArr size 2 is : " + soctempArr.size());
+	    	//log.info("getCallDetails soctempArr size 2 is : " + soctempArr.size());
 	    	
 	    	if(soctempArr!=null && soctempArr.size()>0) {
 	    	
@@ -690,7 +690,7 @@ public class SocketIOConfig {
 		    			
 		    			
 		    			
-		    			log.info("getCallDetails in from userId: " + data.getFrom() + " clientId "+tClientId);
+		    			//log.info("getCallDetails in from userId: " + data.getFrom() + " clientId "+tClientId);
 		    			
 		    			
 		    			if(targetClient!=null) {
@@ -749,10 +749,10 @@ public class SocketIOConfig {
 		    			UUID tclientId = soctempArr.get(data.getTo());
 		    			SocketIOClient targetClient = server.getClient(tclientId);
 		    			
-		    			log.info("startCall in to userId: " + data.getTo() + " clientId "+tclientId);
+		    			//log.info("startCall in to userId: " + data.getTo() + " clientId "+tclientId);
 		    			
 		    			if(targetClient!=null) {
-		    				log.info("startCall is targetClient open: " + targetClient.isChannelOpen());
+		    				//log.info("startCall is targetClient open: " + targetClient.isChannelOpen());
 		    				VedioMessageStartResponse startResponse = new VedioMessageStartResponse();
 		    				startResponse.setFrom(data.getFrom());
 		    				startResponse.setOffer(data.getOffer());
@@ -787,16 +787,16 @@ public class SocketIOConfig {
 		    			UUID tclientId = soctempArr.get(data.getTo());
 		    			SocketIOClient targetClient = server.getClient(tclientId);
 		    			
-		    			log.info("acceptCall in userId: " + data.getTo() + " clientId "+tclientId);
+		    			//log.info("acceptCall in userId: " + data.getTo() + " clientId "+tclientId);
 		    			
 		    			if(targetClient!=null) {
-		    				log.info("acceptCall is targetClient open: " + targetClient.isChannelOpen());
+		    				//log.info("acceptCall is targetClient open: " + targetClient.isChannelOpen());
 		    				VedioMessageAcceptResponse acceptResponse = new VedioMessageAcceptResponse();
 		    				acceptResponse.setFrom(data.getFrom());
 		    				acceptResponse.setAns(data.getAns());
 		    				
 		    				Long startTime = System.currentTimeMillis();
-		    				log.info("acceptCall startTime "+startTime);
+		    				//log.info("acceptCall startTime "+startTime);
 		    				
 		    				callRoomMapDuration.put(data.getRoom(), startTime);
 		    				
@@ -841,7 +841,7 @@ public class SocketIOConfig {
 			
 			
 				UUID clientIdfrom = (UUID) userIdToSocketIdMap.get(data.getFrom());
-				log.info("checkUserStatus clientIdfrom: "+clientIdfrom);
+				//log.info("checkUserStatus clientIdfrom: "+clientIdfrom);
 				
 				Map<Long,UUID>  soctempArr = (Map<Long,UUID>) callRoomMap.get(data.getRoom());
 				if(soctempArr!=null && soctempArr.size()>0) {
@@ -849,17 +849,17 @@ public class SocketIOConfig {
 				UUID clientIdto = soctempArr.get(data.getTo());
 				
 				//if(clientIdfrom!=null) {
-					log.info("checkUserStatus in touserId: " + data.getTo() + " clientIdto "+clientIdto+ " fromUserId: "+data.getFrom()+ " clientIdfrom: "+clientIdfrom);
+					//log.info("checkUserStatus in touserId: " + data.getTo() + " clientIdto "+clientIdto+ " fromUserId: "+data.getFrom()+ " clientIdfrom: "+clientIdfrom);
 					
 					SocketIOClient targetClientfrom = server.getClient(clientIdfrom);
 					if(targetClientfrom!=null) {
-						log.info("checkUserStatus is targetClientfrom open: " + targetClientfrom.isChannelOpen());
+						//log.info("checkUserStatus is targetClientfrom open: " + targetClientfrom.isChannelOpen());
 						SocketIOClient targetClientto = server.getClient(clientIdto);
 						
 						CheckUserStatusCheckResponse status = new CheckUserStatusCheckResponse();
 						
 						if(targetClientto!=null) {
-							log.info("checkUserStatus is targetClientto open in IF: " + targetClientto.isChannelOpen());
+							//log.info("checkUserStatus is targetClientto open in IF: " + targetClientto.isChannelOpen());
 							
 							status.setFrom(data.getFrom());
 							status.setTo(data.getTo());
@@ -869,7 +869,7 @@ public class SocketIOConfig {
 							log.info("checkUserStatus Response in IF "+status.toString());
 							targetClientfrom.sendEvent("checkUserStatusResponse",status);
 						}else {
-							log.info("checkUserStatus is targetClientto open in ELSE: " + targetClientto.isChannelOpen());
+							//log.info("checkUserStatus is targetClientto open in ELSE: " + targetClientto.isChannelOpen());
 							
 							status.setFrom(data.getFrom());
 							status.setTo(data.getTo());
@@ -882,11 +882,11 @@ public class SocketIOConfig {
 					//}
 				}
 			}else {
-				log.info(" fromUserId: "+data.getFrom()+ " clientIdfrom: "+clientIdfrom);
+				//log.info(" fromUserId: "+data.getFrom()+ " clientIdfrom: "+clientIdfrom);
 				SocketIOClient targetClientfrom = server.getClient(clientIdfrom);
 				
 				if(targetClientfrom!=null) {
-					log.info("checkUserStatus is targetClientfrom open in : " + targetClientfrom.isChannelOpen());
+					//log.info("checkUserStatus is targetClientfrom open in : " + targetClientfrom.isChannelOpen());
 					CheckUserStatusCheckResponse status = new CheckUserStatusCheckResponse();
 					
 					status.setFrom(data.getFrom());
@@ -913,7 +913,7 @@ public class SocketIOConfig {
 			Map<Long,UUID>  soctempArr = (Map<Long,UUID>) callRoomMap.get(data.getRoom());
 			//log.info("negotiationNeeded soctempArr size: " + soctempArr.size());
 			UUID clientIdto = soctempArr.get(data.getTo());
-			log.info("negotiationNeeded 11 in touserId: " + data.getTo() + " clientIdto "+clientIdto);
+			//log.info("negotiationNeeded 11 in touserId: " + data.getTo() + " clientIdto "+clientIdto);
 			if(clientIdto==null) {
 				//soctempArr.put(data.getTo(), client.getSessionId());
 				if(userIdToSocketIdMap.get(data.getTo())!=null)
@@ -928,11 +928,11 @@ public class SocketIOConfig {
 		    			//SocketIOClient targetClient = server.getClient(entry.getValue());
 		    			clientIdto = soctempArr.get(data.getTo());
 		    			if(clientIdto!=null) {
-			    			log.info("negotiationNeeded in touserId: " + data.getTo() + " clientIdto "+clientIdto);
+			    			//log.info("negotiationNeeded in touserId: " + data.getTo() + " clientIdto "+clientIdto);
 			    			SocketIOClient targetClient = server.getClient(clientIdto);
 			    			
 			    			if(targetClient!=null) {
-			    				log.info("negotiationNeeded is targetClient open: " + targetClient.isChannelOpen());
+			    				//log.info("negotiationNeeded is targetClient open: " + targetClient.isChannelOpen());
 			    				
 			    				VedioMessageStartResponse startResponse = new VedioMessageStartResponse();
 			    				startResponse.setFrom(data.getFrom());
@@ -969,11 +969,11 @@ public class SocketIOConfig {
 			    		//if(data.getFrom()!=entry.getKey() || !data.getFrom().equals(entry.getKey())) {
 			    			//SocketIOClient targetClient = server.getClient(entry.getValue());
 			    			UUID clientIdto = soctempArr.get(data.getTo());
-			    			log.info("negotiationDone in touserId: " + data.getTo() + " clientIdto "+clientIdto);
+			    			//log.info("negotiationDone in touserId: " + data.getTo() + " clientIdto "+clientIdto);
 			    			SocketIOClient targetClient = server.getClient(clientIdto);
 			    			
 			    			if(targetClient!=null) {
-			    				log.info("negotiationDone is targetClient open: " + targetClient.isChannelOpen());
+			    				//log.info("negotiationDone is targetClient open: " + targetClient.isChannelOpen());
 			    				VedioMessageNegotiationResponse doneResponse = new VedioMessageNegotiationResponse();
 			    				doneResponse.setFrom(data.getFrom());
 			    				doneResponse.setAns(data.getAns());
@@ -1008,18 +1008,18 @@ public class SocketIOConfig {
 	    	
 			if(soctempArr!=null && soctempArr.size()>0) {
 				for (Map.Entry<Long,UUID> entry : soctempArr.entrySet()) {
-		    		log.info("iceCandidate in userId: " + entry.getKey() + " clientId "+entry.getValue());
+		    		//log.info("iceCandidate in userId: " + entry.getKey() + " clientId "+entry.getValue());
 		    		
 		    		if(data.getFrom()!=entry.getKey() || !data.getFrom().equals(entry.getKey())) {
 		    			//SocketIOClient targetClient = server.getClient(entry.getValue());
 		    			
 		    			clientIdto = soctempArr.get(data.getTo());
 		    			if(clientIdto!=null) {
-		    			log.info("iceCandidate in touserId: " + data.getTo() + " clientIdto "+clientIdto);
+		    			//log.info("iceCandidate in touserId: " + data.getTo() + " clientIdto "+clientIdto);
 		    			SocketIOClient targetClient = server.getClient(clientIdto);
 		    			
 		    			if(targetClient!=null) {
-		    				log.info("iceCandidate is targetClient open: " + targetClient.isChannelOpen());
+		    				//log.info("iceCandidate is targetClient open: " + targetClient.isChannelOpen());
 		    				VedioMessageIceCandidateResponse iceResponse = new VedioMessageIceCandidateResponse();
 		    				iceResponse.setFrom(data.getFrom());
 		    				iceResponse.setCandidate(data.getCandidate());
@@ -1054,13 +1054,13 @@ public class SocketIOConfig {
 	    	
 			if(soctempArr!=null && soctempArr.size()>0) {
 				for (Map.Entry<Long,UUID> entry : soctempArr.entrySet()) {
-		    		log.info("enblevideo in userId: " + entry.getKey() + " clientId "+entry.getValue());
+		    		//log.info("enblevideo in userId: " + entry.getKey() + " clientId "+entry.getValue());
 		    		
 		    		if(data.getTo()==entry.getKey() || data.getTo().equals(entry.getKey())) {
 		    			//SocketIOClient targetClient = server.getClient(entry.getValue());
 		    			
 		    			clientIdto = soctempArr.get(data.getTo());
-		    			log.info("enblevideo in touserId: " + data.getTo() + " clientIdto "+clientIdto);
+		    			//log.info("enblevideo in touserId: " + data.getTo() + " clientIdto "+clientIdto);
 		    			SocketIOClient targetClient = server.getClient(clientIdto);
 		    			
 		    			if(targetClient!=null) {
@@ -1097,13 +1097,13 @@ public class SocketIOConfig {
 	    	
 			if(soctempArr!=null && soctempArr.size()>0) {
 				for (Map.Entry<Long,UUID> entry : soctempArr.entrySet()) {
-		    		log.info("disablevideo in userId: " + entry.getKey() + " clientId "+entry.getValue());
+		    		//log.info("disablevideo in userId: " + entry.getKey() + " clientId "+entry.getValue());
 		    		
 		    		if(data.getTo()==entry.getKey() || data.getTo().equals(entry.getKey())) {
 		    			//SocketIOClient targetClient = server.getClient(entry.getValue());
 		    			
 		    			clientIdto = soctempArr.get(data.getTo());
-		    			log.info("disablevideo in touserId: " + data.getTo() + " clientIdto "+clientIdto);
+		    			//log.info("disablevideo in touserId: " + data.getTo() + " clientIdto "+clientIdto);
 		    			SocketIOClient targetClient = server.getClient(clientIdto);
 		    			
 		    			if(targetClient!=null) {
@@ -1140,13 +1140,13 @@ public class SocketIOConfig {
 	    	
 			if(soctempArr!=null && soctempArr.size()>0) {
 				for (Map.Entry<Long,UUID> entry : soctempArr.entrySet()) {
-		    		log.info("enbleaudio in userId: " + entry.getKey() + " clientId "+entry.getValue());
+		    		//log.info("enbleaudio in userId: " + entry.getKey() + " clientId "+entry.getValue());
 		    		
 		    		if(data.getTo()==entry.getKey() || data.getTo().equals(entry.getKey())) {
 		    			//SocketIOClient targetClient = server.getClient(entry.getValue());
 		    			
 		    			clientIdto = soctempArr.get(data.getTo());
-		    			log.info("enbleaudio in touserId: " + data.getTo() + " clientIdto "+clientIdto);
+		    			//log.info("enbleaudio in touserId: " + data.getTo() + " clientIdto "+clientIdto);
 		    			SocketIOClient targetClient = server.getClient(clientIdto);
 		    			
 		    			if(targetClient!=null) {
@@ -1181,13 +1181,13 @@ public class SocketIOConfig {
 	    	
 			if(soctempArr!=null && soctempArr.size()>0) {
 				for (Map.Entry<Long,UUID> entry : soctempArr.entrySet()) {
-		    		log.info("disableaudio in userId: " + entry.getKey() + " clientId "+entry.getValue());
+		    		//log.info("disableaudio in userId: " + entry.getKey() + " clientId "+entry.getValue());
 		    		
 		    		if(data.getTo()==entry.getKey() || data.getTo().equals(entry.getKey())) {
 		    			//SocketIOClient targetClient = server.getClient(entry.getValue());
 		    			
 		    			clientIdto = soctempArr.get(data.getTo());
-		    			log.info("disableaudio in touserId: " + data.getTo() + " clientIdto "+clientIdto);
+		    			//log.info("disableaudio in touserId: " + data.getTo() + " clientIdto "+clientIdto);
 		    			SocketIOClient targetClient = server.getClient(clientIdto);
 		    			
 		    			if(targetClient!=null) {
@@ -1213,7 +1213,7 @@ public class SocketIOConfig {
 			Map<Long,UUID>  soctempArr = (Map<Long,UUID>) callRoomMap.get(data.getRoom());
 			//log.info("endCall soctempArr size: " + soctempArr.size());
 			Long startTime = (Long)callRoomMapDuration.get(data.getRoom());
-			log.info("endCall startTime: " + startTime);
+			//log.info("endCall startTime: " + startTime);
 			
 			
 			if(soctempArr!=null && soctempArr.size()>0) {
@@ -1226,12 +1226,12 @@ public class SocketIOConfig {
 				     else {
 						UUID clientIdfrom = soctempArr.get(data.getFrom());
 						
-						log.info("endCall is clientIdfrom open in From: " +clientIdfrom + " user :"+data.getFrom());
+						//log.info("endCall is clientIdfrom open in From: " +clientIdfrom + " user :"+data.getFrom());
 						if(clientIdfrom!=null) {
 							SocketIOClient targetClient = server.getClient(clientIdfrom);
 							
 							if(targetClient!=null) {
-			    				log.info("endCall is targetClient open in From: " + targetClient.isChannelOpen()+" user "+data.getFrom()+" clientIdfrom "+clientIdfrom);
+			    				//log.info("endCall is targetClient open in From: " + targetClient.isChannelOpen()+" user "+data.getFrom()+" clientIdfrom "+clientIdfrom);
 			    				//String from = "own";
 			    				EndCallResponse endCallResponse = new EndCallResponse();
 			    				endCallResponse.setFrom(data.getFrom());
@@ -1260,7 +1260,7 @@ public class SocketIOConfig {
 						//log.info("endCall is clientIdto open in To: " +clientIdto + " user :"+data.getTo());
 						
 						List<UserDeviceInfo> deviceinfoDetails = chatUsersService.getUserDeviceInfoDetails(data.getTo());
-	    				log.info("Check deviceinfoDetails size for end call-->"+deviceinfoDetails.size());
+	    				//log.info("Check deviceinfoDetails size for end call-->"+deviceinfoDetails.size());
 	    				String pushMessage = data.getTo() +" is ended the call";
 	    				
 	    				if(deviceinfoDetails!=null && deviceinfoDetails.size()>0) {
@@ -1289,7 +1289,7 @@ public class SocketIOConfig {
 						SocketIOClient targetClientto = server.getClient(clientIdto);
 						
 						if(targetClientto!=null) {
-		    				log.info("endCall is targetClient open in To: " + targetClientto.isChannelOpen()+" user "+data.getTo()+" clientIdto "+clientIdto);
+		    				//log.info("endCall is targetClient open in To: " + targetClientto.isChannelOpen()+" user "+data.getTo()+" clientIdto "+clientIdto);
 		    				//String from = Long.toString(data.getTo());
 		    				
 		    				
@@ -1325,7 +1325,7 @@ public class SocketIOConfig {
 				     
 				     //Save Duration
 				     Long endTime = System.currentTimeMillis();
-				     log.info("endCall endTime: " + endTime);
+				     //log.info("endCall endTime: " + endTime);
 				    if(startTime == null) {}
 				    else {
 				     if(endTime > startTime) {
@@ -1352,7 +1352,7 @@ public class SocketIOConfig {
 						 
 						  String duration = diffMin + ":" + diffSec;
 						  
-						  log.info("endCall duration "+duration);
+						  //log.info("endCall duration "+duration);
 						  
 						  
 						  map.put("userid", data.getInitiateCallUser());
@@ -1382,19 +1382,19 @@ public class SocketIOConfig {
 			                	String[] mindurationArr = duration.split(":");
 			                	String min = mindurationArr[0];
 			                	
-			                	log.info("endCall min in video-->"+min);
+			                	//log.info("endCall min in video-->"+min);
 			                	
 			                	Integer minduration = Integer.parseInt(min);
 			                	Integer summinduration = vcconsumedminutes + minduration;
 			                	
-			                	log.info("endCall vcconsumedminutes in video-->"+vcconsumedminutes);
-			                	log.info("endCall vcallowedminiutes in video-->"+vcallowedminiutes);
-			                	log.info("endCall minduration in video-->"+minduration);
-			                	log.info("endCall summinduration in video-->"+summinduration);
+			                	//log.info("endCall vcconsumedminutes in video-->"+vcconsumedminutes);
+			                	//log.info("endCall vcallowedminiutes in video-->"+vcallowedminiutes);
+			                	//log.info("endCall minduration in video-->"+minduration);
+			                	//log.info("endCall summinduration in video-->"+summinduration);
 			                	
 			                	ChatUsersMaster user = (ChatUsersMaster)mstList.get(0);
 			                	
-			                	if(summinduration > vcallowedminiutes) {
+			                	if(summinduration >= vcallowedminiutes) {
 			                		user.setVdoutboundisallowed(2);
 			                		user.setVcconsumedminutes(minduration);
 			                		
@@ -1417,19 +1417,19 @@ public class SocketIOConfig {
 			                	String[] mindurationArr = duration.split(":");
 			                	String min = mindurationArr[0];
 			                	
-			                	log.info("endCall min in voice-->"+min);
+			                	//log.info("endCall min in voice-->"+min);
 			                	
 			                	Integer minduration = Integer.parseInt(min);
 			                	Integer summinduration = aucconsumedminutes + minduration;
 			                	
-			                	log.info("endCall aucconsumedminutes in voice-->"+aucconsumedminutes);
-			                	log.info("endCall aucallowedminiutes in voice-->"+aucallowedminiutes);
-			                	log.info("endCall minduration in voice-->"+minduration);
-			                	log.info("endCall summinduration in voice-->"+summinduration);
+			                	//log.info("endCall aucconsumedminutes in voice-->"+aucconsumedminutes);
+			                	//log.info("endCall aucallowedminiutes in voice-->"+aucallowedminiutes);
+			                	//log.info("endCall minduration in voice-->"+minduration);
+			                	//log.info("endCall summinduration in voice-->"+summinduration);
 			                	
 			                	ChatUsersMaster user = (ChatUsersMaster)mstList.get(0);
 			                	
-			                	if(summinduration > aucallowedminiutes) {
+			                	if(summinduration >= aucallowedminiutes) {
 			                		user.setVdoutboundisallowed(2);
 			                		user.setAucconsumedminutes(minduration);
 			                		
@@ -1538,7 +1538,7 @@ public class SocketIOConfig {
             UUID userIdArr = (UUID) userIdToSocketIdMap.get(data.getFrom());
             
             if(userIdArr!=null ) {
-            	log.info("clearRoomandSockets userIdArr : " + userIdArr);
+            	//log.info("clearRoomandSockets userIdArr : " + userIdArr);
             	/*for (UUID  entry : userIdArr) {
             		//SocketIOClient targetClient = server.getClient(entry);
             		if(entry!=null) {
@@ -1598,7 +1598,7 @@ public class SocketIOConfig {
     			pushMessage = "Someone has sent you a "+ callType +" call";
     			
     			
-    			log.info("Check deviceinfoDetails size in CheckTargetOnline init call-->"+deviceinfoDetails.size());
+    			//log.info("Check deviceinfoDetails size in CheckTargetOnline init call-->"+deviceinfoDetails.size());
     			if(deviceinfoDetails!=null && deviceinfoDetails.size()>0) {
     				UserDeviceInfo userDeviceInfo = (UserDeviceInfo)deviceinfoDetails.get(0);
             		  if(userDeviceInfo.getPlatform().equals("android") || userDeviceInfo.getPlatform().equals("ios") || userDeviceInfo.getPlatform().equals("iPhone")) {
