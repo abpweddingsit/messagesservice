@@ -91,6 +91,9 @@ public class UsersServiceRestcontroller {
 			chatUsersMaster.setIsactive(1);
 			chatUsersMaster.setCreatedon(System.currentTimeMillis());
 			
+			chatUsersMaster.setVdoutboundisallowed(1);
+			chatUsersMaster.setVdinboundisallowed(1);
+			
 			List<ChatUsersMaster> chatUser = chatUsersService.getUsersMappedList(userid);
 			if(chatUser!=null && chatUser.size()>0) {
 				chatUsersMaster = (ChatUsersMaster)chatUser.get(0);
