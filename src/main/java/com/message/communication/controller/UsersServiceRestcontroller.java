@@ -275,7 +275,7 @@ public class UsersServiceRestcontroller {
 				mappedchatUsersMapping.setUnreadcount(0);
 				mappedchatUsersMapping.setIsactive(1);
 				
-				chatUsersMapping.setModifyon(System.currentTimeMillis());
+				mappedchatUsersMapping.setModifyon(System.currentTimeMillis());
 				
 				mappedchatUsersMapping.setLastmessageid(0l);
 				

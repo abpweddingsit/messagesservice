@@ -42,11 +42,11 @@ public class ChatUsersMaster {
 	@Column(name = "vdinboundisallowed")
 	private Integer vdinboundisallowed=0;
 	@Column(name = "vcallowedminiutes")
-	private Integer vcallowedminiutes=30;
+	private Long vcallowedminiutes=99999999999l;
 	@Column(name = "vcconsumedminutes")
-	private Integer vcconsumedminutes=0;
+	private Long vcconsumedminutes=0l;
 	@Column(name = "aucallowedminiutes")
-	private Integer aucallowedminiutes=30;
+	private Long aucallowedminiutes=99999999999l;
 	@Column(name = "aucconsumedminutes")
-	private Integer aucconsumedminutes=0;
+	private Long aucconsumedminutes=0l;
 }

@@ -1372,8 +1372,8 @@ public class SocketIOConfig {
 		                if(data.getCalltype().equals("video")) {
 		                	List<ChatUsersMaster> mstList = chatUsersService.getUsersMappedList(data.getFrom());
 		                	if(mstList!=null && mstList.size()>0) {
-			                	Integer vcconsumedminutes = mstList.get(0).getVcconsumedminutes();
-			                	Integer vcallowedminiutes = mstList.get(0).getVcallowedminiutes();
+			                	Long vcconsumedminutes = mstList.get(0).getVcconsumedminutes();
+			                	Long vcallowedminiutes = mstList.get(0).getVcallowedminiutes();
 			                	
 			                	
 			                	
@@ -1384,8 +1384,8 @@ public class SocketIOConfig {
 			                	
 			                	//log.info("endCall min in video-->"+min);
 			                	
-			                	Integer minduration = Integer.parseInt(min);
-			                	Integer summinduration = vcconsumedminutes + minduration;
+			                	Long minduration =Long.parseLong(min); //Integer.parseInt(min);
+			                	Long summinduration = vcconsumedminutes + minduration;
 			                	
 			                	//log.info("endCall vcconsumedminutes in video-->"+vcconsumedminutes);
 			                	//log.info("endCall vcallowedminiutes in video-->"+vcallowedminiutes);
@@ -1410,8 +1410,8 @@ public class SocketIOConfig {
 		                }else if(data.getCalltype().equals("voice")){
 		                	List<ChatUsersMaster> mstList = chatUsersService.getUsersMappedList(data.getFrom());
 		                	if(mstList!=null && mstList.size()>0) {
-			                	Integer aucconsumedminutes = mstList.get(0).getAucconsumedminutes();
-			                	Integer aucallowedminiutes = mstList.get(0).getAucallowedminiutes();
+			                	Long aucconsumedminutes = mstList.get(0).getAucconsumedminutes();
+			                	Long aucallowedminiutes = mstList.get(0).getAucallowedminiutes();
 			                	
 			                	
 			                	String[] mindurationArr = duration.split(":");
@@ -1419,8 +1419,8 @@ public class SocketIOConfig {
 			                	
 			                	//log.info("endCall min in voice-->"+min);
 			                	
-			                	Integer minduration = Integer.parseInt(min);
-			                	Integer summinduration = aucconsumedminutes + minduration;
+			                	Long minduration =Long.parseLong(min); //Integer.parseInt(min);
+			                	Long summinduration = aucconsumedminutes + minduration;
 			                	
 			                	//log.info("endCall aucconsumedminutes in voice-->"+aucconsumedminutes);
 			                	//log.info("endCall aucallowedminiutes in voice-->"+aucallowedminiutes);
